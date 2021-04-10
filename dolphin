@@ -18,26 +18,32 @@ QUOTE="Imagine a dolphin dancing in the sky. Let it dance with joy. Think of you
 # This section contains output functions
 # --------------------------------------------------------------------
 
+# The base output function
 output () {
   echo -e "${1}[🐬 Dolphin] ${2}: ${3}"
 }
 
+# print error message
 error () {
   output $RED error "${1}"
 }
 
+# print success message
 success () {
   output $GREEN success "${1}"
 }
 
+# print warning message
 warning() {
    output $YELLOW warning "${1}"
 }
 
+# print info message
 info() {
   output $BLUE info "${1}"
 }
 
+# print normal non-colored message
 normal() {
   output $NO_COLOR log "${1}"
 }
