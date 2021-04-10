@@ -14,32 +14,95 @@ BLUE='\033[0;34m'
 # Quotes
 QUOTE="Imagine a dolphin dancing in the sky. Let it dance with joy. Think of yourself at the bottom of the ocean watching."
 
+# Repositories
+BACKEND="https://github.com/piscibus/dolphin-api.git"
+FRONTEND="https://github.com/piscibus/dolphin-ui.git"
+
 # --------------------------------------------------------------------
 # This section contains output functions
 # --------------------------------------------------------------------
 
-output () {
+# The base output function
+output() {
   echo -e "${1}[🐬 Dolphin] ${2}: ${3}"
 }
 
-error () {
+# print error message
+error() {
   output $RED error "${1}"
 }
 
-success () {
+# print success message
+success() {
   output $GREEN success "${1}"
 }
 
+# print warning message
 warning() {
-   output $YELLOW warning "${1}"
+  output $YELLOW warning "${1}"
 }
 
+# print info message
 info() {
   output $BLUE info "${1}"
 }
 
+# print normal non-colored message
 normal() {
   output $NO_COLOR log "${1}"
+}
+
+# --------------------------------------------------------------------
+# This section contains the functions utilized by the main scrip
+# --------------------------------------------------------------------
+
+# Install the project components
+install() {
+  info "🚚 Installation starts..."
+  {
+    install_backend &&
+      success "Backend component installed."
+  } || {
+    error "Failed to install the backend component"
+    exit 1
+  }
+
+  {
+    install_frontend &&
+      success "Frontend component installed."
+  } || {
+    error "Failed to install the frontend component"
+    exit 1
+  }
+}
+
+# Clear component directories and re-installs them
+fresh() {
+  clear
+  install
+}
+
+# Clear component directories
+clear() {
+  info "Clear project components"
+  rm -rf dolphin-api || warning "Backend component already cleared"
+  rm -rf dolphin-ui || warning "Frontend component already cleared"
+}
+
+# Installs the backend component
+install_backend() {
+  info "🚛 Installing Dolphin API"
+  normal "Cloning ${BACKEND}"
+
+  git clone "${BACKEND}"
+}
+
+# Installs the frontend component
+install_frontend() {
+  info "🚛 Installing Dolphin UI"
+  normal "Cloning ${FRONTEND}"
+
+  git clone "${FRONTEND}"
 }
 
 # --------------------------------------------------------------------
@@ -52,16 +115,30 @@ UNAMEOUT="$(uname -s)"
 
 # Verify operating system is supported...
 case "${UNAMEOUT}" in
-    Linux*)             MACHINE=linux;;
-    Darwin*)            MACHINE=mac;;
-    *)                  MACHINE="UNKNOWN"
+Linux*) MACHINE=linux ;;
+Darwin*) MACHINE=mac ;;
+*) MACHINE="UNKNOWN" ;;
 esac
 
 if [ "$MACHINE" == "UNKNOWN" ]; then
-    error "❌ Unsupported operating system [$(uname -s)]. Dolphin supports macOS, Linux, and Windows (WSL2)." >&2
+  error "❌ Unsupported operating system [$(uname -s)]. Dolphin supports macOS, Linux, and Windows (WSL2)." >&2
 
-    exit 1
+  exit 1
 else
   success "✅ Your operating system [$(uname -s)] is supported."
   success "🚀Dolphin is starting..."
+fi
+
+if [ $# -gt 0 ]; then
+  if [ "$1" == "install" ]; then
+    shift 1
+
+    install
+  fi
+
+  if [ "$1" == "fresh" ]; then
+    shift 1
+
+    fresh
+  fi
 fi
