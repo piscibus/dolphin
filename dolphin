@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+
+# --------------------------------------------------------------------
+# This section contains global constants
+# --------------------------------------------------------------------
+
+# Colors
+NO_COLOR='\033[0m'
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+
+# Quotes
+QUOTE="Imagine a dolphin dancing in the sky. Let it dance with joy. Think of yourself at the bottom of the ocean watching."
+
+# --------------------------------------------------------------------
+# This section contains output functions
+# --------------------------------------------------------------------
+
+output () {
+  echo -e "${1}[🐬 Dolphin] ${2}: ${3}"
+}
+
+error () {
+  output $RED error "${1}"
+}
+
+success () {
+  output $GREEN success "${1}"
+}
+
+warning() {
+   output $YELLOW warning "${1}"
+}
+
+info() {
+  output $BLUE info "${1}"
+}
+
+normal() {
+  output $NO_COLOR log "${1}"
+}
+
+# --------------------------------------------------------------------
+# This section contains the main script
+# --------------------------------------------------------------------
+
+info "💾 Verifying your operating system..."
+
+UNAMEOUT="$(uname -s)"
+
+# Verify operating system is supported...
+case "${UNAMEOUT}" in
+    Linux*)             MACHINE=linux;;
+    Darwin*)            MACHINE=mac;;
+    *)                  MACHINE="UNKNOWN"
+esac
+
+if [ "$MACHINE" == "UNKNOWN" ]; then
+    error "❌ Unsupported operating system [$(uname -s)]. Dolphin supports macOS, Linux, and Windows (WSL2)." >&2
+
+    exit 1
+else
+  success "✅ Your operating system [$(uname -s)] is supported."
+  success "🚀Dolphin is starting..."
+fi
