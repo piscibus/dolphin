@@ -18,6 +18,10 @@ QUOTE="Imagine a dolphin dancing in the sky. Let it dance with joy. Think of you
 BACKEND="https://github.com/piscibus/dolphin-api.git"
 FRONTEND="https://github.com/piscibus/dolphin-ui.git"
 
+# Directories
+BACKEND_DIR="dolphin-api"
+FRONTEND_DIR="dolphin-ui"
+
 # --------------------------------------------------------------------
 # This section contains output functions
 # --------------------------------------------------------------------
@@ -95,6 +99,14 @@ install_backend() {
   normal "Cloning ${BACKEND}"
 
   git clone "${BACKEND}"
+  cd "$BACKEND_DIR"
+  composer update
+  cp .env.example .env
+  php artisan key:generate
+  ./vendor/bin/sail build --no-cache
+  sail artisan migrate:refresh seed
+  sail artisan dolphin:passport:seed
+  cd ..
 }
 
 # Installs the frontend component
@@ -103,6 +115,21 @@ install_frontend() {
   normal "Cloning ${FRONTEND}"
 
   git clone "${FRONTEND}"
+}
+
+# Start development environment
+develop() {
+  info "🚀 Starting development environment"
+
+  backend_develop
+}
+
+# Start backend development environment
+backend_develop() {
+  cd "${BACKEND_DIR}"
+  ./vendor/bin/sail down
+  ./vendor/bin/sail up -d
+  success "✅ Backend project is up and running!"
 }
 
 # --------------------------------------------------------------------
@@ -139,6 +166,12 @@ if [ $# -gt 0 ]; then
   if [ "$1" == "reset" ]; then
     shift 1
 
-    fresh
+    reset
+  fi
+
+  if [ "$1" == "dev" ]; then
+    shift 1
+
+    develop
   fi
 fi
