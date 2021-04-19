@@ -77,7 +77,7 @@ install() {
 }
 
 # Clear component directories and re-installs them
-fresh() {
+reset() {
   clear
   install
 }
@@ -136,7 +136,7 @@ if [ $# -gt 0 ]; then
     install
   fi
 
-  if [ "$1" == "fresh" ]; then
+  if [ "$1" == "reset" ]; then
     shift 1
 
     fresh
